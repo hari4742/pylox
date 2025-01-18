@@ -10,12 +10,9 @@ class Lox:
     def run_file(self, filename):
         with open(filename) as file:
             file_contents = file.read()
-        if file_contents:
             self.run(file_contents)
             if self.hasError:
                 exit(65)
-        else:
-            print("File is empty!")
 
     def run_prompt(self):
         while True:
