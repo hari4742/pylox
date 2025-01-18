@@ -1,4 +1,5 @@
 import sys
+from lox.lox import Lox
 
 
 def main():
@@ -15,15 +16,8 @@ def main():
     if command != "tokenize":
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
-
-    with open(filename) as file:
-        file_contents = file.read()
-
-    if file_contents:
-        raise NotImplementedError("Scanner not implemented")
-    else:
-        # Placeholder, remove this line when implementing the scanner
-        print("EOF  null")
+    lox = Lox()
+    lox.run_file(filename)
 
 
 if __name__ == "__main__":
