@@ -91,7 +91,7 @@ class Scanner:
             elif (c.isalpha() or c == '_'):
                 self.identifier()
             else:
-                self.error(f"Unexpected character - {c}")
+                self.error(f"Unexpected character: {c}")
 
     def advance(self) -> str:
         self.current += 1
