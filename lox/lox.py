@@ -35,5 +35,5 @@ class Lox:
 
     @classmethod
     def report(cls, line: int, where: str, message: str):
-        print(f"[line {line}] Error {where}: {message}")
+        print(f"[line {line}] Error{where}: {message}")
         cls.hasError = True
