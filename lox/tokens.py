@@ -59,7 +59,7 @@ class Token:
         self.line = line
 
     def __rper__(self):
-        return f"{self.token_type.name} {self.lexeme} {self.literal if self.literal else 'null'}"
+        return f"{self.token_type.name} {self.lexeme} {self.literal if self.literal is not None else 'null'}"
 
     def __str__(self):
         return self.__rper__()
