@@ -1,16 +1,6 @@
 import sys
-from lox.scanner import Scanner
+from lox.ast_printer import AstPrinter
 from lox.lox import Lox
-
-
-def get_file_contents(filename):
-    with open(filename) as file:
-        return file.read()
-
-
-def get_tokens(code):
-    scanner = Scanner(code)
-    return scanner.scan_tokens()
 
 
 def main():
@@ -24,16 +14,20 @@ def main():
     command = sys.argv[1]
     filename = sys.argv[2]
 
-    code = get_file_contents(filename)
+    lox = Lox()
+    lox.run_file(filename)
 
     if command == 'tokenize':
-        tokens = get_tokens(code)
+        tokens = lox.tokens
         for token in tokens:
             print(token)
 
     elif command == 'parse':
-        lox = Lox()
-        lox.run_file(filename)
+        if lox.hasError:
+            return
+
+        printer = AstPrinter()
+        print(printer.print(lox.expr))
     else:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)

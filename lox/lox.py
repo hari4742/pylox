@@ -28,15 +28,12 @@ class Lox:
 
     def run(self, code: str):
         scanner = Scanner(code)
-        tokens = scanner.scan_tokens()
-        parser = Parser(tokens)
-        expr: Expr = parser.parse()
+        self.tokens = scanner.scan_tokens()
+        parser = Parser(self.tokens)
+        self.expr: Expr = parser.parse()
 
         if self.hasError:
             return
-
-        printer = AstPrinter()
-        print(printer.print(expr))
 
     @classmethod
     def error(cls, line: int, message: str):
