@@ -19,11 +19,10 @@ class Lox:
             code = self.get_file_contents(filename)
             scanner = Scanner(code)
             tokens = scanner.scan_tokens()
-            if self.hasError:
-                exit(65)
-            tokens = tokens
             for token in tokens:
                 print(token)
+            if self.hasError:
+                exit(65)
 
         elif command == 'parse':
             code = self.get_file_contents(filename)
