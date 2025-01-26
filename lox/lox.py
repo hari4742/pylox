@@ -10,6 +10,25 @@ class Lox:
     def __init__(self):
         pass
 
+    def run_cmd(self, command, filename):
+        if command == 'tokenize':
+            self.run_file(filename)
+            if self.hasError:
+                exit(65)
+            tokens = self.tokens
+            for token in tokens:
+                print(token)
+        elif command == 'parse':
+            self.run_file(filename)
+            if self.hasError:
+                exit(65)
+            printer = AstPrinter()
+            print(printer.print(self.expr))
+        else:
+            import sys
+            print(f"Unknown command: {command}", file=sys.stderr)
+            exit(1)
+
     def run_file(self, filename):
         with open(filename) as file:
             file_contents = file.read()

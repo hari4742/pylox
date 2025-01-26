@@ -15,22 +15,7 @@ def main():
     filename = sys.argv[2]
 
     lox = Lox()
-    lox.run_file(filename)
-
-    if command == 'tokenize':
-        tokens = lox.tokens
-        for token in tokens:
-            print(token)
-
-    elif command == 'parse':
-        if lox.hasError:
-            return
-
-        printer = AstPrinter()
-        print(printer.print(lox.expr))
-    else:
-        print(f"Unknown command: {command}", file=sys.stderr)
-        exit(1)
+    lox.run_cmd(command, filename)
 
 
 if __name__ == "__main__":
