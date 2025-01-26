@@ -10,20 +10,31 @@ class Lox:
     def __init__(self):
         pass
 
+    def get_file_contents(self, filename):
+        with open(filename) as file:
+            return file.read()
+
     def run_cmd(self, command, filename):
         if command == 'tokenize':
-            self.run_file(filename)
+            code = self.get_file_contents(filename)
+            scanner = Scanner(code)
+            tokens = scanner.scan_tokens()
             if self.hasError:
                 exit(65)
-            tokens = self.tokens
+            tokens = tokens
             for token in tokens:
                 print(token)
+
         elif command == 'parse':
-            self.run_file(filename)
+            code = self.get_file_contents(filename)
+            scanner = Scanner(code)
+            tokens = scanner.scan_tokens()
+            parser = Parser(tokens)
+            expr: Expr = parser.parse()
             if self.hasError:
                 exit(65)
             printer = AstPrinter()
-            print(printer.print(self.expr))
+            print(printer.print(expr))
         else:
             import sys
             print(f"Unknown command: {command}", file=sys.stderr)
@@ -47,9 +58,9 @@ class Lox:
 
     def run(self, code: str):
         scanner = Scanner(code)
-        self.tokens = scanner.scan_tokens()
-        parser = Parser(self.tokens)
-        self.expr: Expr = parser.parse()
+        tokens = scanner.scan_tokens()
+        parser = Parser(tokens)
+        expr: Expr = parser.parse()
 
         if self.hasError:
             return
