@@ -1,5 +1,16 @@
 import sys
+from lox.scanner import Scanner
 from lox.lox import Lox
+
+
+def get_file_contents(filename):
+    with open(filename) as file:
+        return file.read()
+
+
+def get_tokens(code):
+    scanner = Scanner(code)
+    return scanner.scan_tokens()
 
 
 def main():
@@ -7,17 +18,25 @@ def main():
     print("Logs from your program will appear here!", file=sys.stderr)
 
     if len(sys.argv) < 3:
-        print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
+        print("Usage: ./your_program.sh <command> <filename>", file=sys.stderr)
         exit(1)
 
     command = sys.argv[1]
     filename = sys.argv[2]
 
-    if command != "tokenize":
+    code = get_file_contents(filename)
+
+    if command == 'tokenize':
+        tokens = get_tokens(code)
+        for token in tokens:
+            print(token)
+
+    elif command == 'parse':
+        lox = Lox()
+        lox.run_file(filename)
+    else:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
-    lox = Lox()
-    lox.run_file(filename)
 
 
 if __name__ == "__main__":

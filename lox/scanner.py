@@ -1,4 +1,4 @@
-from lox.tokens import Token, TokenType
+from lox.token import Token, TokenType
 
 
 class Scanner:
