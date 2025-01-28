@@ -14,6 +14,10 @@ class AstPrinter(Expr.Visitor):
     def visit_expr_literal(self, expr: Literal):
         if expr.value is None:
             return "nil"
+        if expr.value is True:
+            return "true"
+        if expr.value is False:
+            return "false"
         return str(expr.value)
 
     def visit_expr_unary(self, expr: Unary):

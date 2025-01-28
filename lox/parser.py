@@ -70,9 +70,9 @@ class Parser:
 
     def primary(self) -> Expr:
         if self.match(TokenType.FALSE):
-            return Literal('false')
+            return Literal(False)
         if self.match(TokenType.TRUE):
-            return Literal('true')
+            return Literal(True)
         if self.match(TokenType.NIL):
             return Literal(None)
         if self.match(TokenType.NUMBER, TokenType.STRING):
