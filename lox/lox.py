@@ -2,10 +2,14 @@ from lox.scanner import Scanner
 from lox.parser import Parser
 from lox.expr import Expr
 from lox.ast_printer import AstPrinter
+from lox.error import LoxRuntimeError
+from lox.interpreter import Interpreter
 
 
 class Lox:
     hasError: bool = False
+    has_runtime_error: bool = False
+    interpreter = Interpreter()
 
     def __init__(self):
         pass
@@ -34,6 +38,18 @@ class Lox:
                 exit(65)
             printer = AstPrinter()
             print(printer.print(expr))
+
+        elif command == 'evaluate':
+            code = self.get_file_contents(filename)
+            scanner = Scanner(code)
+            tokens = scanner.scan_tokens()
+            parser = Parser(tokens)
+            expr: Expr = parser.parse()
+            self.interpreter.interpret(expr)
+            if self.hasError:
+                exit(65)
+            if self.has_runtime_error:
+                exit(70)
         else:
             import sys
             print(f"Unknown command: {command}", file=sys.stderr)
@@ -45,6 +61,8 @@ class Lox:
             self.run(file_contents)
             if self.hasError:
                 exit(65)
+            if self.has_runtime_error:
+                exit(70)
 
     def run_prompt(self):
         while True:
@@ -60,13 +78,17 @@ class Lox:
         tokens = scanner.scan_tokens()
         parser = Parser(tokens)
         expr: Expr = parser.parse()
-
-        if self.hasError:
-            return
+        self.interpreter.interpret(expr)
 
     @classmethod
     def error(cls, line: int, message: str):
         cls.report(line, "", message)
+
+    @classmethod
+    def runtime_error(cls, error: LoxRuntimeError):
+        import sys
+        print(error.message + f"\n[line {error.token.line}]", file=sys.stderr)
+        cls.has_runtime_error = True
 
     @classmethod
     def report(cls, line: int, where: str, message: str):
