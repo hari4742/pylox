@@ -7,18 +7,23 @@ class GenerateAst:
             print("Usage: generate_ast <output directory>")
             exit(1)
         output_dir = args[0]
+        # GenerateAst.define_ast(output_dir, "Stmt", [
+        #     "Expression : Expr expression",
+        #     "Print : Expr expression",
+        #     "Var : Token name, Expr initializer"
+        # ])
         GenerateAst.define_ast(output_dir, "Expr", [
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : object value",
-            "Unary    : Token operator, Expr right"
+            "Unary    : Token operator, Expr right",
+            "Variable : Token name"
         ])
 
     @staticmethod
     def define_ast(output_dir: str, base_name: str, types: list):
         path = output_dir + "/" + base_name.lower() + ".py"
         with open(path, "w") as file:
-            file.write("from typing import Any\n")
             file.write("from lox.token import Token\n\n")
             file.write(f"class {base_name}:\n")
             GenerateAst.define_visitor(file, base_name, types)
@@ -30,7 +35,7 @@ class GenerateAst:
 
     @staticmethod
     def define_visitor(file, base_name: str, types: list):
-        file.write("\n    class Visitor(Any):\n")
+        file.write("\n    class Visitor:\n")
         for type in types:
             type_name = type.split(":")[0].strip()
             file.write(

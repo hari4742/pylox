@@ -1,23 +1,23 @@
 from lox.token import Token
 
-
 class Expr:
 
     class Visitor:
         def visit_expr_binary(self, expr: 'Binary'):
             pass
-
         def visit_expr_grouping(self, expr: 'Grouping'):
             pass
-
         def visit_expr_literal(self, expr: 'Literal'):
             pass
-
         def visit_expr_unary(self, expr: 'Unary'):
             pass
+        def visit_expr_variable(self, expr: 'Variable'):
+            pass
 
-    def accept(self, visitor: Visitor):
+
+    def accept(self, visitor: Visitor ):
         pass
+
 
 
 class Binary(Expr):
@@ -30,6 +30,7 @@ class Binary(Expr):
         self.operator = operator
         self.right = right
 
+
     def accept(self, visitor: Expr.Visitor):
         return visitor.visit_expr_binary(self)
 
@@ -40,6 +41,7 @@ class Grouping(Expr):
     def __init__(self, expression):
         self.expression = expression
 
+
     def accept(self, visitor: Expr.Visitor):
         return visitor.visit_expr_grouping(self)
 
@@ -49,6 +51,7 @@ class Literal(Expr):
 
     def __init__(self, value):
         self.value = value
+
 
     def accept(self, visitor: Expr.Visitor):
         return visitor.visit_expr_literal(self)
@@ -62,5 +65,17 @@ class Unary(Expr):
         self.operator = operator
         self.right = right
 
+
     def accept(self, visitor: Expr.Visitor):
         return visitor.visit_expr_unary(self)
+
+
+class Variable(Expr):
+    name: Token
+
+    def __init__(self, name):
+        self.name = name
+
+
+    def accept(self, visitor: Expr.Visitor):
+        return visitor.visit_expr_variable(self)

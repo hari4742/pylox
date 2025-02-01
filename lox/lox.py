@@ -4,6 +4,7 @@ from lox.expr import Expr
 from lox.ast_printer import AstPrinter
 from lox.error import LoxRuntimeError
 from lox.interpreter import Interpreter
+from lox.stmt import Stmt
 
 
 class Lox:
@@ -44,12 +45,19 @@ class Lox:
             scanner = Scanner(code)
             tokens = scanner.scan_tokens()
             parser = Parser(tokens)
-            expr: Expr = parser.parse()
-            self.interpreter.interpret(expr)
+            expr: Expr = parser.expression()
+            try:
+                value = self.interpreter.expression(expr)
+                print(self.interpreter.stringify(value))
+            except LoxRuntimeError as error:
+                from lox.lox import Lox
+                Lox.runtime_error(error)
             if self.hasError:
                 exit(65)
             if self.has_runtime_error:
                 exit(70)
+        elif command == 'run':
+            self.run_file(filename)
         else:
             import sys
             print(f"Unknown command: {command}", file=sys.stderr)
@@ -77,8 +85,8 @@ class Lox:
         scanner = Scanner(code)
         tokens = scanner.scan_tokens()
         parser = Parser(tokens)
-        expr: Expr = parser.parse()
-        self.interpreter.interpret(expr)
+        statements: Stmt = parser.parse()
+        self.interpreter.interpret(statements)
 
     @classmethod
     def error(cls, line: int, message: str):

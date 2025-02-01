@@ -1,17 +1,30 @@
 from lox.expr import Expr, Literal, Grouping, Unary, Binary
 from lox.token import TokenType, Token
 from lox.error import LoxRuntimeError
+from lox.stmt import Stmt
 
 
-class Interpreter(Expr.Visitor):
+class Interpreter(Expr.Visitor, Stmt.Visitor):
 
-    def interpret(self, expr: Expr):
+    def interpret(self, statements: list[Stmt]):
         try:
-            value = self.expression(expr)
-            print(self.stringify(value))
+            for statement in statements:
+                self.execute(statement)
         except LoxRuntimeError as error:
             from lox.lox import Lox
             Lox.runtime_error(error)
+
+    def execute(self, statement: Stmt):
+        statement.accept(self)
+
+    def visit_stmt_expression(self, stmt):
+        self.expression(stmt.expression)
+        return None
+
+    def visit_stmt_print(self, stmt):
+        value = self.expression(stmt.expression)
+        print(self.stringify(value))
+        return None
 
     def visit_expr_literal(self, expr: Literal):
         return expr.value
