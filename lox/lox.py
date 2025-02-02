@@ -36,7 +36,10 @@ class Lox:
             if self.hasError:
                 exit(65)
             parser = Parser(tokens)
-            expr: Expr = parser.expression()
+            try:
+                expr: Expr = parser.expression()
+            except:
+                pass
             if self.hasError:
                 exit(65)
             printer = AstPrinter()
