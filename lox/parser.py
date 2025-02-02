@@ -21,7 +21,9 @@ class Parser:
         statements: list[Stmt] = []
 
         while (not self.is_at_end()):
-            statements.append(self.declaration())
+            statement = self.declaration()
+            if statements is not None:
+                statements.append(statement)
 
         return statements
 

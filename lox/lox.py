@@ -86,6 +86,7 @@ class Lox:
         tokens = scanner.scan_tokens()
         parser = Parser(tokens)
         statements: Stmt = parser.parse()
+        return
         self.interpreter.interpret(statements)
 
     @classmethod
