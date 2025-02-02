@@ -22,7 +22,7 @@ class Parser:
 
         while (not self.is_at_end()):
             statement = self.declaration()
-            if statements is not None:
+            if statement is not None:
                 statements.append(statement)
 
         return statements
