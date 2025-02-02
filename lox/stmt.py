@@ -5,6 +5,9 @@ from lox.expr import Expr
 class Stmt:
 
     class Visitor:
+        def visit_stmt_block(self, stmt: 'Block'):
+            pass
+
         def visit_stmt_expression(self, stmt: 'Expression'):
             pass
 
@@ -16,6 +19,16 @@ class Stmt:
 
     def accept(self, visitor: Visitor):
         pass
+
+
+class Block(Stmt):
+    statements: list[Stmt]
+
+    def __init__(self, statements):
+        self.statements = statements
+
+    def accept(self, visitor: Expr.Visitor):
+        return visitor.visit_stmt_block(self)
 
 
 class Expression(Stmt):

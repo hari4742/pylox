@@ -1,10 +1,13 @@
-from lox.expr import Expr, Literal, Grouping, Unary, Binary
+from lox.expr import Expr, Literal, Grouping, Unary, Binary, Variable, Assign
 from lox.token import TokenType, Token
 from lox.error import LoxRuntimeError
 from lox.stmt import Stmt
+from lox.environment import Environment
 
 
 class Interpreter(Expr.Visitor, Stmt.Visitor):
+
+    environment = Environment()
 
     def interpret(self, statements: list[Stmt]):
         try:
@@ -26,8 +29,41 @@ class Interpreter(Expr.Visitor, Stmt.Visitor):
         print(self.stringify(value))
         return None
 
+    def visit_stmt_var(self, stmt):
+        value = None
+
+        if (stmt.initializer is not None):
+            value = self.expression(stmt.initializer)
+
+        self.environment.define(stmt.name.lexeme, value)
+
+        return None
+
+    def visit_expr_variable(self, expr: Variable):
+        return self.environment.get(expr.name)
+
+    def visit_expr_assign(self, expr: Assign):
+        value: object = self.expression(expr.value)
+        self.environment.assign(expr.name, value)
+        return value
+
     def visit_expr_literal(self, expr: Literal):
         return expr.value
+
+    def visit_stmt_block(self, stmt):
+        self.execute_block(stmt.statements, Environment(self.environment))
+        return None
+
+    def execute_block(self, statements: list[Stmt], environment: Environment):
+        previous: Environment = self.environment
+
+        try:
+            self.environment = environment
+
+            for statement in statements:
+                self.execute(statement)
+        finally:
+            self.environment = previous
 
     def visit_expr_grouping(self, expr: Grouping):
         return self.expression(expr.expression)

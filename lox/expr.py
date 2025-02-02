@@ -3,6 +3,8 @@ from lox.token import Token
 class Expr:
 
     class Visitor:
+        def visit_expr_assign(self, expr: 'Assign'):
+            pass
         def visit_expr_binary(self, expr: 'Binary'):
             pass
         def visit_expr_grouping(self, expr: 'Grouping'):
@@ -18,6 +20,19 @@ class Expr:
     def accept(self, visitor: Visitor ):
         pass
 
+
+
+class Assign(Expr):
+    name: Token
+    value: Expr
+
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+
+    def accept(self, visitor: Expr.Visitor):
+        return visitor.visit_expr_assign(self)
 
 
 class Binary(Expr):

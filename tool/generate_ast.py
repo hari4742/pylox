@@ -7,18 +7,20 @@ class GenerateAst:
             print("Usage: generate_ast <output directory>")
             exit(1)
         output_dir = args[0]
-        # GenerateAst.define_ast(output_dir, "Stmt", [
-        #     "Expression : Expr expression",
-        #     "Print : Expr expression",
-        #     "Var : Token name, Expr initializer"
-        # ])
-        GenerateAst.define_ast(output_dir, "Expr", [
-            "Binary   : Expr left, Token operator, Expr right",
-            "Grouping : Expr expression",
-            "Literal  : object value",
-            "Unary    : Token operator, Expr right",
-            "Variable : Token name"
+        GenerateAst.define_ast(output_dir, "Stmt", [
+            "Block : list[Stmt] statements",
+            "Expression : Expr expression",
+            "Print : Expr expression",
+            "Var : Token name, Expr initializer"
         ])
+        # GenerateAst.define_ast(output_dir, "Expr", [
+        #     "Assign   : Token name, Expr value",
+        #     "Binary   : Expr left, Token operator, Expr right",
+        #     "Grouping : Expr expression",
+        #     "Literal  : object value",
+        #     "Unary    : Token operator, Expr right",
+        #     "Variable : Token name"
+        # ])
 
     @staticmethod
     def define_ast(output_dir: str, base_name: str, types: list):
