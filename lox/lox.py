@@ -34,7 +34,7 @@ class Lox:
             scanner = Scanner(code)
             tokens = scanner.scan_tokens()
             parser = Parser(tokens)
-            expr: Expr = parser.parse()
+            expr: Expr = parser.expression()
             if self.hasError:
                 exit(65)
             printer = AstPrinter()
