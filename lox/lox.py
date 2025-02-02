@@ -33,6 +33,8 @@ class Lox:
             code = self.get_file_contents(filename)
             scanner = Scanner(code)
             tokens = scanner.scan_tokens()
+            if self.hasError:
+                exit(65)
             parser = Parser(tokens)
             expr: Expr = parser.expression()
             if self.hasError:
