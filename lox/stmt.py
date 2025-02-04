@@ -11,10 +11,16 @@ class Stmt:
         def visit_stmt_expression(self, stmt: 'Expression'):
             pass
 
+        def visit_stmt_if(self, stmt: 'If'):
+            pass
+
         def visit_stmt_print(self, stmt: 'Print'):
             pass
 
         def visit_stmt_var(self, stmt: 'Var'):
+            pass
+
+        def visit_stmt_while(self, stmt: 'While'):
             pass
 
     def accept(self, visitor: Visitor):
@@ -24,7 +30,7 @@ class Stmt:
 class Block(Stmt):
     statements: list[Stmt]
 
-    def __init__(self, statements):
+    def __init__(self, statements: list[Stmt]):
         self.statements = statements
 
     def accept(self, visitor: Expr.Visitor):
@@ -39,6 +45,20 @@ class Expression(Stmt):
 
     def accept(self, visitor: Expr.Visitor):
         return visitor.visit_stmt_expression(self)
+
+
+class If(Stmt):
+    condition: Expr
+    then_branch: Stmt
+    else_branch: Stmt
+
+    def __init__(self, condition, then_branch, else_branch):
+        self.condition = condition
+        self.then_branch = then_branch
+        self.else_branch = else_branch
+
+    def accept(self, visitor: Expr.Visitor):
+        return visitor.visit_stmt_if(self)
 
 
 class Print(Stmt):
@@ -61,3 +81,15 @@ class Var(Stmt):
 
     def accept(self, visitor: Expr.Visitor):
         return visitor.visit_stmt_var(self)
+
+
+class While(Stmt):
+    condition: Expr
+    body: Stmt
+
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+
+    def accept(self, visitor: Expr.Visitor):
+        return visitor.visit_stmt_while(self)

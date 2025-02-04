@@ -1,7 +1,7 @@
-from lox.expr import Expr, Literal, Grouping, Unary, Binary, Variable, Assign
+from lox.expr import Expr, Literal, Grouping, Unary, Binary, Variable, Assign, Logical
 from lox.token import TokenType, Token
 from lox.error import LoxRuntimeError
-from lox.stmt import Stmt
+from lox.stmt import Stmt, If, While
 from lox.environment import Environment
 
 
@@ -22,6 +22,19 @@ class Interpreter(Expr.Visitor, Stmt.Visitor):
 
     def visit_stmt_expression(self, stmt):
         self.expression(stmt.expression)
+        return None
+
+    def visit_stmt_while(self, stmt: While):
+
+        while (self.is_truthy(self.expression(stmt.condition))):
+            self.execute(stmt.body)
+        return None
+
+    def visit_stmt_if(self, stmt: If):
+        if (self.is_truthy(self.expression(stmt.condition))):
+            self.execute(stmt.then_branch)
+        elif (stmt.else_branch is not None):
+            self.execute(stmt.else_branch)
         return None
 
     def visit_stmt_print(self, stmt):
@@ -49,6 +62,17 @@ class Interpreter(Expr.Visitor, Stmt.Visitor):
 
     def visit_expr_literal(self, expr: Literal):
         return expr.value
+
+    def visit_expr_logical(self, expr: Logical):
+        left: object = self.expression(expr.left)
+
+        if (expr.operator.token_type == TokenType.OR):
+            if self.is_truthy(left):
+                return left
+        else:
+            if not self.is_truthy(left):
+                return left
+        return self.expression(expr.right)
 
     def visit_stmt_block(self, stmt):
         self.execute_block(stmt.statements, Environment(self.environment))
