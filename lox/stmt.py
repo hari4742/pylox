@@ -23,6 +23,12 @@ class Stmt:
         def visit_stmt_while(self, stmt: 'While'):
             pass
 
+        def visit_stmt_function(self, stmt: 'Function'):
+            pass
+
+        def visit_stmt_return(self, stmt: 'Return'):
+            pass
+
     def accept(self, visitor: Visitor):
         pass
 
@@ -30,7 +36,7 @@ class Stmt:
 class Block(Stmt):
     statements: list[Stmt]
 
-    def __init__(self, statements: list[Stmt]):
+    def __init__(self, statements):
         self.statements = statements
 
     def accept(self, visitor: Expr.Visitor):
@@ -93,3 +99,29 @@ class While(Stmt):
 
     def accept(self, visitor: Expr.Visitor):
         return visitor.visit_stmt_while(self)
+
+
+class Function(Stmt):
+    name: Token
+    params: list[Token]
+    body: list[Stmt]
+
+    def __init__(self, name, params, body):
+        self.name = name
+        self.params = params
+        self.body = body
+
+    def accept(self, visitor: Expr.Visitor):
+        return visitor.visit_stmt_function(self)
+
+
+class Return(Stmt):
+    keyword: Token
+    value: Expr
+
+    def __init__(self, keyword, value):
+        self.keyword = keyword
+        self.value = value
+
+    def accept(self, visitor: Expr.Visitor):
+        return visitor.visit_stmt_return(self)

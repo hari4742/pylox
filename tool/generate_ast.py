@@ -13,12 +13,15 @@ class GenerateAst:
             "If : Expr condition, Stmt then_branch, Stmt else_branch",
             "Print : Expr expression",
             "Var : Token name, Expr initializer",
-            "While : Expr condition, Stmt body"
+            "While : Expr condition, Stmt body",
+            "Function : Token name, list[Token] params, list[Stmt] body",
+            "Return     : Token keyword, Expr value"
         ])
         # GenerateAst.define_ast(output_dir, "Expr", [
         #     "Assign   : Token name, Expr value",
         #     "Binary   : Expr left, Token operator, Expr right",
         #     "Grouping : Expr expression",
+        #     "Call     : Expr calle, Token paren, list[Expr] arguments",
         #     "Literal  : object value",
         #     "Logical  : Expr left, Token operator, Expr right",
         #     "Unary    : Token operator, Expr right",

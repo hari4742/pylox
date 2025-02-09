@@ -1,13 +1,29 @@
-from lox.expr import Expr, Literal, Grouping, Unary, Binary, Variable, Assign, Logical
+import time
+from lox.expr import Expr, Literal, Grouping, Unary, Binary, Variable, Assign, Logical, Call
 from lox.token import TokenType, Token
 from lox.error import LoxRuntimeError
-from lox.stmt import Stmt, If, While
+from lox.stmt import Stmt, If, While, Function
 from lox.environment import Environment
+from lox.lox_callable import LoxCallable
+from lox.return_error import ReturnError
 
 
 class Interpreter(Expr.Visitor, Stmt.Visitor):
+    lox_globals = Environment()
+    environment = lox_globals
 
-    environment = Environment()
+    def __init__(self):
+        class Clock(LoxCallable):
+            def arity(self):
+                return 0
+
+            def call(self, interpreter, arguments):
+                return time.time()
+
+            def __str__(self):
+                return "<native fn>"
+
+        self.lox_globals.define("clock", Clock())
 
     def interpret(self, statements: list[Stmt]):
         try:
@@ -51,6 +67,38 @@ class Interpreter(Expr.Visitor, Stmt.Visitor):
         self.environment.define(stmt.name.lexeme, value)
 
         return None
+
+    def visit_stmt_function(self, stmt: Function):
+        from lox.lox_function import LoxFunction
+        function: LoxFunction = LoxFunction(stmt, self.environment)
+        self.environment.define(stmt.name.lexeme, function)
+        return None
+
+    def visit_expr_call(self, expr: Call):
+        callee: object = self.expression(expr.callee)
+        arguments: list[object] = []
+
+        for argument in expr.arguments:
+            arguments.append(self.expression(argument))
+
+        if not isinstance(callee, LoxCallable):
+            raise LoxRuntimeError(
+                expr.paren, "Can only call functions and classes.")
+
+        function: LoxCallable = callee
+
+        if len(arguments) != function.arity():
+            raise LoxRuntimeError(
+                expr.paren, f"Expected {function.arity()} arguments but got {arguments.size()}.")
+        return function.call(self, arguments)
+
+    def visit_stmt_return(self, stmt):
+        val: object = None
+
+        if stmt.value is not None:
+            val = self.expression(stmt.value)
+
+        raise ReturnError(val)
 
     def visit_expr_variable(self, expr: Variable):
         return self.environment.get(expr.name)

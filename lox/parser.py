@@ -1,6 +1,6 @@
 from lox.token import Token, TokenType
-from lox.expr import Expr, Binary, Grouping, Literal, Unary, Variable, Assign, Logical
-from lox.stmt import Stmt, Print, Expression, Var, Block, If, While
+from lox.expr import Expr, Binary, Grouping, Literal, Unary, Variable, Assign, Logical, Call
+from lox.stmt import Stmt, Print, Expression, Var, Block, If, While, Function, Return
 
 
 class ParseError(Exception):
@@ -29,12 +29,51 @@ class Parser:
 
     def declaration(self) -> Stmt:
         try:
+            if self.match(TokenType.FUN):
+                return self.function("function")
             if self.match(TokenType.VAR):
                 return self.var_declaration()
             return self.statement()
         except ParseError as error:
             self.synchronize()
             return None
+
+    def function(self, kind: str):
+        name: Token = self.consume(TokenType.IDENTIFIER, "Expect {kind} name.")
+
+        self.consume(TokenType.LEFT_PAREN, "Expect '(' after {kind} name.")
+
+        parameters: list[Token] = []
+
+        if not self.check(TokenType.RIGHT_PAREN):
+            parameters.append(self.consume(
+                TokenType.IDENTIFIER, "Expect parameter name."))
+
+            while self.match(TokenType.COMMA):
+                if len(parameters) >= 255:
+                    raise self.error(
+                        self.peek(), "Can't have more than 255 parameters.")
+                parameters.append(self.consume(
+                    TokenType.IDENTIFIER, "Expect parameter name."))
+
+        self.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+        self.consume(TokenType.LEFT_BRACE, "Expect '{' before {kind} body.")
+
+        body: list[Stmt] = self.block()
+
+        return Function(name, parameters, body)
+
+    def return_stmt(self):
+        keyword: Token = self.previous()
+
+        val: Expr = None
+
+        if not self.check(TokenType.SEMICOLON):
+            val = self.expression()
+
+        self.consume(TokenType.SEMICOLON,  "Expect ';' after return value.")
+
+        return Return(keyword, val)
 
     def var_declaration(self):
         name: Token = self.consume(
@@ -55,6 +94,8 @@ class Parser:
             return self.if_statement()
         if self.match(TokenType.PRINT):
             return self.print_statement()
+        if self.match(TokenType.RETURN):
+            return self.return_stmt()
         if self.match(TokenType.WHILE):
             return self.while_statement()
         if self.match(TokenType.LEFT_BRACE):
@@ -224,7 +265,33 @@ class Parser:
             operator = self.previous()
             right: Expr = self.unary()
             return Unary(operator, right)
-        return self.primary()
+        return self.call()
+
+    def call(self) -> Expr:
+        expr: Expr = self.primary()
+
+        while True:
+            if (self.match(TokenType.LEFT_PAREN)):
+                expr = self.finish_call(expr)
+            else:
+                break
+
+        return expr
+
+    def finish_call(self, callee: Expr):
+        arguments: list[Expr] = []
+
+        if (not self.check(TokenType.RIGHT_PAREN)):
+            arguments.append(self.expression())
+
+            while self.match(TokenType.COMMA):
+                if len(arguments) >= 255:
+                    self.error(
+                        self.peek(), "Can't have more than 255 arguments.")
+                arguments.append(self.expression())
+        paren: Token = self.consume(
+            TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
+        return Call(callee, paren, arguments)
 
     def primary(self) -> Expr:
         if self.match(TokenType.FALSE):
@@ -274,9 +341,9 @@ class Parser:
             return self.advance()
         raise self.error(self.peek(), message)
 
-    def error(self, token, message):
+    def error(self, token: Token, message):
         from lox.lox import Lox
-        Lox.error(token, message)
+        Lox.error(token.line, message)
         return ParseError(token, message)
 
     def synchronize(self):

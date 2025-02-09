@@ -13,6 +13,9 @@ class Expr:
         def visit_expr_grouping(self, expr: 'Grouping'):
             pass
 
+        def visit_expr_call(self, expr: 'Call'):
+            pass
+
         def visit_expr_literal(self, expr: 'Literal'):
             pass
 
@@ -65,10 +68,24 @@ class Grouping(Expr):
         return visitor.visit_expr_grouping(self)
 
 
+class Call(Expr):
+    callee: Expr
+    paren: Token
+    arguments: list[Expr]
+
+    def __init__(self, callee, paren, arguments):
+        self.callee = callee
+        self.paren = paren
+        self.arguments = arguments
+
+    def accept(self, visitor: Expr.Visitor):
+        return visitor.visit_expr_call(self)
+
+
 class Literal(Expr):
     value: object
 
-    def __init__(self, value: object):
+    def __init__(self, value):
         self.value = value
 
     def accept(self, visitor: Expr.Visitor):
