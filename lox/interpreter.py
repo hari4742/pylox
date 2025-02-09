@@ -89,7 +89,7 @@ class Interpreter(Expr.Visitor, Stmt.Visitor):
 
         if len(arguments) != function.arity():
             raise LoxRuntimeError(
-                expr.paren, f"Expected {function.arity()} arguments but got {arguments.size()}.")
+                expr.paren, f"Expected {function.arity()} arguments but got {len(arguments)}.")
         return function.call(self, arguments)
 
     def visit_stmt_return(self, stmt):
