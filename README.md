@@ -1,50 +1,121 @@
-[![progress-banner](https://backend.codecrafters.io/progress/interpreter/fc5f3f66-5e3e-4b28-8159-74198d3d6508)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# Pylox 🦊
 
-This is a starting point for Python solutions to the
-["Build your own Interpreter" Challenge](https://app.codecrafters.io/courses/interpreter/overview).
+A Python-based frontend for a Lox interpreter, implementing lexical analysis, parsing, abstract syntax tree (AST) generation, and expression evaluation.
 
-This challenge follows the book
-[Crafting Interpreters](https://craftinginterpreters.com/) by Robert Nystrom.
+## 📖 Overview
 
-In this challenge you'll build an interpreter for
-[Lox](https://craftinginterpreters.com/the-lox-language.html), a simple
-scripting language. Along the way, you'll learn about tokenization, ASTs,
-tree-walk interpreters and more.
+Pylox is a frontend implementation of a Lox interpreter, inspired by _Crafting Interpreters_ by Robert Nystrom. It processes Lox source code by tokenizing it, constructing an abstract syntax tree, evaluating expressions, and executing statements.
 
-Before starting this challenge, make sure you've read the "Welcome" part of the
-book that contains these chapters:
+## 🚀 Features
 
-- [Introduction](https://craftinginterpreters.com/introduction.html) (chapter 1)
-- [A Map of the Territory](https://craftinginterpreters.com/a-map-of-the-territory.html)
-  (chapter 2)
-- [The Lox Language](https://craftinginterpreters.com/the-lox-language.html)
-  (chapter 3)
+- **Lexical Analysis**: Tokenizes source code into meaningful lexical components.
+- **Parsing**: Constructs an abstract syntax tree (AST) from tokenized input.
+- **AST Printer**: Provides a visual representation of the parsed AST.
+- **Expression Evaluation**: Computes the results of parsed expressions.
+- **Error Handling**: Implements structured error reporting for syntax and runtime exceptions.
+- **Scoped Environment**: Supports variable scoping and function execution.
 
-These chapters don't involve writing code, so they won't be covered in this
-challenge. This challenge will start from chapter 4,
-[Scanning](https://craftinginterpreters.com/scanning.html).
+## 📝 Usage
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
-
-# Passing the first stage
-
-The entry point for your program is in `app/main.py`. Study and uncomment the
-relevant code, and push your changes to pass the first stage:
+### Run a Lox script
 
 ```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
+python pylox.py examples/script.lox
 ```
 
-Time to move on to the next stage!
+Run Pylox with different commands:
 
-# Stage 2 & beyond
+### Tokenize
 
-Note: This section is for stages 2 and beyond.
+```sh
+python pylox-cli.py tokenize examples/script.lox
+```
 
-1. Ensure you have `python (3.12)` installed locally
-2. Run `./your_program.sh` to run your program, which is implemented in
-   `app/main.py`.
-3. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+Outputs the tokenized representation of the source code.
+
+### Parse
+
+```sh
+python pylox-cli.py parse examples/script.lox
+```
+
+Parses the tokens into an abstract syntax tree (AST) and prints its structure.
+
+### Evaluate
+
+```sh
+python pylox-cli.py evaluate examples/script.lox
+```
+
+Evaluates expressions in the source code and outputs computed results.
+
+Executes the script by interpreting its statements.
+
+## 📜 Grammar
+
+Pylox uses a recursive descent parser based on the following context-free grammar:
+
+```
+program       -> declaration* EOF ;
+declaration   -> funDecl | varDecl | statement ;
+funDecl       -> "fun" function ;
+function      -> IDENTIFIER "(" parameters? ")" block ;
+parameters    -> IDENTIFIER ( "," IDENTIFIER )* ;
+statement     -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block;
+returnStmt    -> "return" expression? ";" ;
+forStmt       -> "for" "(" (varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
+whileStmt     -> "while" "(" expression ")" statement ;
+ifStmt        -> "if" "(" expression ")" statement ( "else" statement )? ;
+block         -> "{" declaration* "}" ;
+varDecl       -> "var" IDENTIFIER ( "=" expression )? ";" ;
+exprStmt      -> expression ";" ;
+printStmt     -> "print" expression ";" ;
+expression    -> assignment ;
+assignment    -> IDENTIFIER "=" assignment | logic_or ;
+logic_or      -> logic_and ( "or" logic_and )* ;
+logic_and     -> equality ( "and" equality )* ;
+equality      -> comparison ( ("!=" | "==") comparison )* ;
+comparison    -> term ( ( ">" | ">=" | "<" | "<=" ) term )*;
+term          -> factor ( ( "-" | "+" ) factor )* ;
+factor        -> unary ( ( "/" | "*" ) unary )* ;
+unary         -> ( "!" | "-" ) unary | call ;
+call          -> primary ( "(" arguments? ")" )* ;
+arguments     -> expression ( "," expression )* ;
+primary       -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+```
+
+## 🛠 Project Structure
+
+```
+pylox/
+├── lox/
+│   ├── ast_printer.py  # Prints AST structures
+│   ├── environment.py  # Manages variable scopes
+│   ├── error.py        # Handles error reporting
+│   ├── expr.py         # Defines AST expression nodes
+│   ├── interpreter.py  # Core interpreter logic
+│   ├── lox_callable.py # Interface for callable functions
+│   ├── lox_function.py # Implements Lox functions
+│   ├── lox.py          # Main Lox class
+│   ├── parser.py       # Implements parsing logic
+│   ├── return_error.py # Return statement exception handling
+│   ├── scanner.py      # Tokenizes source code
+│   ├── stmt.py         # Defines AST statement nodes
+│   ├── token.py        # Token class and type declarations
+├── examples/
+│   ├── script.lox  # Sample Lox scripts
+├── app/
+│   ├── main.py
+├── tool/
+│   ├── generate_ast.py # Helper script for AST node generation
+├── pylox.py        # Entrypoint for the interpreter
+├── pylox-cli.py    # Entry point for command execution
+├── README.md
+├── requirements.txt
+├── LICENSE
+```
+
+## 🙌 Acknowledgments
+
+- Inspired by [_Crafting Interpreters_](https://craftinginterpreters.com/) by Robert Nystrom.
+- Special thanks to code crafters more about them [here](./code-crafters.md).
