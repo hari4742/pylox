@@ -1,0 +1,8 @@
+// Define the function
+fun hello (name){
+    print "Hello " + name ;
+    print "This is lox";
+}
+
+// Calling function
+hello("Hari");
